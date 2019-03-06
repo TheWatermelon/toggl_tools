@@ -102,7 +102,7 @@ def print_inline_running():
         description = running_description(entry)
         start_time, run_time = get_time(entry)
         project = running_project(entry)
-        print('{} @{} {}\''.format(description, project, run_time.split(':')[1]))
+        print('{} @{} {}'.format(description, project, run_time[0:5]))
 
 
 def start_toggl(description, tags):
