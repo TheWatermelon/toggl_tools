@@ -96,13 +96,13 @@ def print_running():
 
 def print_inline_running():
     entry = toggl.running_entry()
-    if entry == None:
-        print("Toggl off")
-    else:
+    if entry != None:
         description = running_description(entry)
         start_time, run_time = get_time(entry)
         project = running_project(entry)
         print('{} @{} {}'.format(description, project, run_time[0:5]))
+    else:
+        print("Toggl off")
 
 
 def start_toggl(description, tags):
