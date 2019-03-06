@@ -7,8 +7,8 @@ These should eventually include the following features:
 * a cli application to start, stop and check running entries from the terminal;
 * a polybar plugin to keep track of running entries.
 
-## config
-To use these, you should place them somewhere and run them. A file named config should be placed on the same folder, containing only your Toggl API key.
+## Dependencies
+To use these, you should place them somewhere and run them. A file named `config` should be placed on the same folder, containing only your Toggl API key.
 
 toggl_cli.py depends on toggl_tools.py. They also require the following python modules:
 * requests
