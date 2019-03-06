@@ -5,15 +5,6 @@ import time
 import os
 from toggl_tools import Toggl
 
-"""
-try:
-    import toggl_polybar as Polybar
-except ImportError:
-    polybar = False
-else:
-    polybar = True
-"""
-
 toggl = Toggl()
 
 ### Timezone (??)
@@ -65,6 +56,13 @@ def running_description(entry):
     return description
 
 
+def running_project(entry):
+    entry_data = entry['data']
+    pid = entry_data['pid']
+    project = toggl.get_project(pid)
+    return project['name']
+
+
 def running_tags(entry):
     entry_data = entry['data']
     tags = entry_data['tags']
@@ -80,16 +78,31 @@ def print_running():
         print("No Toggl entry is running.")
     else:
         description = running_description(entry)
-        tags = running_tags(entry)
         start_time, run_time = get_time(entry)
         print('>>> Running:      ' + description)
+        """
+        tags = running_tags(entry)
         if tags is not None:
             print('>>> Tags:         ' + ",".join(tags))
+        """
+        project = running_project(entry)
+        print('>>> Project:      ' + project)
         print('>>> Start time:   ' + start_time)
         print('>>> Running for:  ' + run_time)
-        
-    # Decoding time.
-    # Formatting everything.
+
+        # Decoding time.
+        # Formatting everything.
+
+
+def print_inline_running():
+    entry = toggl.running_entry()
+    if entry == None:
+        print("Toggl off")
+    else:
+        description = running_description(entry)
+        start_time, run_time = get_time(entry)
+        project = running_project(entry)
+        print('{} @{} {}\''.format(description, project, run_time.split(':')[1]))
 
 
 def start_toggl(description, tags):
@@ -166,8 +179,8 @@ def resume():
 
     """
     >>> You can resume the following entries:
-    > 1 - test [tag]
-    > 2 - another [different_tag]
+    > 1 - test [project]
+    > 2 - another [other project]
     >>> Type an entry number: 
     """
     
@@ -182,12 +195,16 @@ if __name__ == '__main__':
                        help="Stop the running Toggl entry.")
     group.add_argument('--resume', action='store_true',
                        help="Resume a previous Toggl entry.")
-
+    """
     parser.add_argument('-t', '--tag', nargs='+',
                         help="Set tags for the new Toggl entry.")
-    
+    """
     parser.add_argument('-r', '--running', default=False,
                         help="Check running Toggl entry.",
+                        action='store_true')
+
+    parser.add_argument('-p', '--print', default=False,
+                        help="Print current Toggl entry in one line",
                         action='store_true')
 
     args = parser.parse_args()
@@ -195,8 +212,11 @@ if __name__ == '__main__':
     if args.running:
         print_running()
 
-    elif args.tag and args.new:
-        start_toggl(str(args.new), args.tag)
+    elif args.print:
+        print_inline_running()
+
+    elif args.new:
+        start_toggl(str(args.new))
 
     elif args.resume:
         resume()
@@ -207,13 +227,5 @@ if __name__ == '__main__':
     # Default behaviour is to show running entries.
     else:
         print_running()
-    '''
-    if args.tag and not args.new:
-        print("Incorrect usage.")
-        exit()
-
-    elif args.new:
-        start_toggl(str(args.new))
-    '''
 
     read_api_key()

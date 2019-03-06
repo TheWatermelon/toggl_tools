@@ -8,6 +8,7 @@ class Toggl():
 
     def __init__(self):
         # URLs
+        self.url_me = 'https://www.toggl.com/api/v8/me'
         self.url_current = 'https://www.toggl.com/api/v8/time_entries/current'
         self.url_start = 'https://www.toggl.com/api/v8/time_entries/start'
         self.url_entries = 'https://www.toggl.com/api/v8/time_entries'
@@ -64,7 +65,13 @@ class Toggl():
         
         https://www.toggl.com/api/v8/time_entries?start_date=2013-03-10T15%3A42%3A46%2B02%3A00&end_date=2013-03-12T15%3A42%3A46%2B02%3A00
         """
-    
+
+
+    def default_workspace(self):
+        """Returns the default workspace of current user"""
+        user_info = self.request(self.url_me)
+        return user_info['data']['default_wid']
+
     
     def workspaces(self):
         """Returns a list with the ids of one or more workspaces."""
@@ -73,12 +80,25 @@ class Toggl():
         for workspace in workspaces:
             array.append(workspace['id'])
         return array
-        
-    
+
+
+    def projects(self):
+        """Returns all projects in default workspace"""
+        workspace = self.default_workspace()
+        projects = self.request(self.url_workspaces+'/{}/projects'.format(workspace))
+        return projects
+
+
+    def get_project(self, pid):
+        projects = self.projects()
+        for project in projects:
+            if project['id'] == pid:
+                return project
+
+
     #
     # --- Handling running entries. ---
     #
-    
     def running_entry(self):
         """Returns the running Toggl entry or None if none exists."""
         run_entry = self.request(self.url_current)
